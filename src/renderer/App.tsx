@@ -1,50 +1,54 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
-import './App.css';
+import { RouterProvider } from 'react-router-dom';
+import './App.scss';
+import { router } from '@app/router';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import { AppContextProvider } from '@app/context/app.context';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { useEffect } from 'react';
+import { IPC_MESSAGE_ERROR, IPC_MESSAGE_SUCCESS } from '../shared/common';
 
-function Hello() {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
-}
+const darkTheme = createTheme({
+  palette: {
+    mode: 'light',
+  },
+});
 
 export default function App() {
+  const { electron } = window;
+  useEffect(() => {
+    const u1 = electron.ipcRenderer.on(IPC_MESSAGE_ERROR, (args) => {
+      console.log('error');
+      console.log(args);
+      if (typeof args === 'string') {
+        toast(args, { type: 'error' });
+      }
+    });
+    const u2 = electron.ipcRenderer.on(IPC_MESSAGE_SUCCESS, (args) => {
+      console.log('success');
+      console.log(args);
+      if (typeof args === 'string') {
+        toast(args);
+      }
+    });
+
+    return () => {
+      u1();
+      u2();
+    };
+  }, [electron.ipcRenderer]);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <AppContextProvider>
+        <RouterProvider router={router} />
+        <ToastContainer />
+      </AppContextProvider>
+    </ThemeProvider>
   );
 }

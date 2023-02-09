@@ -9,11 +9,17 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import './ipc';
+
+import installExtension, {
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer';
 
 class AppUpdater {
   constructor() {
@@ -71,8 +77,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 1600,
+    height: 900,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -128,6 +134,14 @@ app
   .whenReady()
   .then(() => {
     createWindow();
+
+    // install react dev tool
+    installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
+      loadExtensionOptions: { allowFileAccess: true },
+    })
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log('An error occurred: ', err));
+
     app.on('activate', () => {
       // On macOS, it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

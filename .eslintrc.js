@@ -1,5 +1,6 @@
 module.exports = {
   extends: 'erb',
+  plugins: ['simple-import-sort'],
   rules: {
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
@@ -8,6 +9,12 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
     'import/no-import-module-exports': 'off',
+    'import/prefer-default-export': 'off',
+    'react/jsx-no-useless-fragment': 'off',
+    'no-console': 'off',
+    'consistent-return': 'off',
+    'promise/always-return': 'off',
+    'react/function-component-definition': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
